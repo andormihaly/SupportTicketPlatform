@@ -1,0 +1,9 @@
+[mcp_servers.microsoft-learn]
+url = "https://learn.microsoft.com/api/mcp"
+
+[mcp_servers.dotnet-roslyn]
+command = "dotnet-roslyn-mcp"
+args = [
+  "--solution",
+  "SupportTicketPlatform.slnx"
+]
