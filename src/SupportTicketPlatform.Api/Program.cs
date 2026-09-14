@@ -1,12 +1,18 @@
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Scalar.AspNetCore;
 using SupportTicketPlatform.Api.ExceptionHandling;
 using SupportTicketPlatform.Api.Validation;
 using SupportTicketPlatform.Application;
 using SupportTicketPlatform.Infrastructure;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using Scalar.AspNetCore;
+using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseWolverine(options =>
+{
+    options.Discovery.IncludeAssembly(typeof(AssemblyReference).Assembly);
+});
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
