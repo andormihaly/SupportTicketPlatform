@@ -7,6 +7,7 @@ WORKDIR /src
 COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["src/SupportTicketPlatform.Api/SupportTicketPlatform.Api.csproj", "src/SupportTicketPlatform.Api/"]
 COPY ["src/SupportTicketPlatform.Application/SupportTicketPlatform.Application.csproj", "src/SupportTicketPlatform.Application/"]
+COPY ["src/SupportTicketPlatform.Contracts/SupportTicketPlatform.Contracts.csproj", "src/SupportTicketPlatform.Contracts/"]
 COPY ["src/SupportTicketPlatform.Domain/SupportTicketPlatform.Domain.csproj", "src/SupportTicketPlatform.Domain/"]
 COPY ["src/SupportTicketPlatform.Infrastructure/SupportTicketPlatform.Infrastructure.csproj", "src/SupportTicketPlatform.Infrastructure/"]
 RUN dotnet restore "src/SupportTicketPlatform.Api/SupportTicketPlatform.Api.csproj"
