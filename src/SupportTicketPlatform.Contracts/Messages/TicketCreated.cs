@@ -8,4 +8,4 @@ public sealed record TicketCreated(
     string Title,
     string Description,
     string Status,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset OccurredAt);

@@ -20,5 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SupportTicketPlatform.Contracts\SupportTicketPlatform.Contracts.csproj" />
     <ProjectReference Include="..\SupportTicketPlatform.ServiceDefaults\SupportTicketPlatform.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatForm.Worker.Application\SupportTicketPlatform.Worker.Application.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatForm.Worker.Infrastructure\SupportTicketPlatform.Worker.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
