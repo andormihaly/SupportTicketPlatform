@@ -1,0 +1,16 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>30707428-e8fd-43fd-82a4-b0f9acec6406</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SupportTicketPlatform.Api\SupportTicketPlatform.Api.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatform.Worker\SupportTicketPlatform.Worker.csproj" />
+  </ItemGroup>
+
+</Project>

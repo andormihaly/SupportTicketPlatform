@@ -13,6 +13,8 @@ using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 var keyVaultUri = builder.Configuration["KeyVaultUri"];
 
 if (!string.IsNullOrWhiteSpace(keyVaultUri))

@@ -19,5 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SupportTicketPlatform.Contracts\SupportTicketPlatform.Contracts.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatform.ServiceDefaults\SupportTicketPlatform.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

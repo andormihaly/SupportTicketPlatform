@@ -1,10 +1,12 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/SupportTicketPlatform.Api/SupportTicketPlatform.Api.csproj" />
+    <Project Path="src/SupportTicketPlatform.AppHost/SupportTicketPlatform.AppHost.csproj" />
     <Project Path="src/SupportTicketPlatform.Application/SupportTicketPlatform.Application.csproj" />
     <Project Path="src/SupportTicketPlatform.Contracts/SupportTicketPlatform.Contracts.csproj" />
     <Project Path="src/SupportTicketPlatform.Domain/SupportTicketPlatform.Domain.csproj" />
     <Project Path="src/SupportTicketPlatform.Infrastructure/SupportTicketPlatform.Infrastructure.csproj" />
+    <Project Path="src/SupportTicketPlatform.ServiceDefaults/SupportTicketPlatform.ServiceDefaults.csproj" Id="ebad4287-1b12-4d2d-b0fe-69c3cb5a93fb" />
     <Project Path="src/SupportTicketPlatform.Worker/SupportTicketPlatform.Worker.csproj" />
   </Folder>
   <Folder Name="/test/">

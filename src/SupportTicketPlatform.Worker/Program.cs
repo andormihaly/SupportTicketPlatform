@@ -3,6 +3,9 @@ using Azure.Messaging.ServiceBus;
 using SupportTicketPlatform.Worker;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.AddServiceDefaults();
+
 builder.Services.AddHostedService<Worker>();
 
 builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["KeyVaultUri"]!), new DefaultAzureCredential());
