@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Worker.Infrastructure.Persistence.Converters;
 
 namespace SupportTicketPlatForm.Worker.Infrastructure.Persistence.Configurations;
 
@@ -23,5 +24,7 @@ public sealed class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.Property(x => x.LastModifiedAt);
+
+        builder.Property(x => x.Embedding).HasConversion<VectorValueConverter>().HasColumnType("vector(1536)");
     }
 }
