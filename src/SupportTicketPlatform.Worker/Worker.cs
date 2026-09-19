@@ -1,10 +1,12 @@
 using Azure.Messaging.ServiceBus;
 using SupportTicketPlatform.Contracts.Messages;
+using SupportTicketPlatform.Worker.Application.Features.Tickets.Commands.CreateTicket;
 using System.Text.Json;
+using Wolverine;
 
 namespace SupportTicketPlatform.Worker;
 
-public sealed class Worker(ServiceBusClient serviceBusClient, ILogger<Worker> logger) : BackgroundService
+public sealed class Worker(ServiceBusClient serviceBusClient, IServiceScopeFactory scopeFactory, ILogger<Worker> logger) : BackgroundService
 {
     private const string QueueName = "ticket-created";
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -51,7 +53,12 @@ public sealed class Worker(ServiceBusClient serviceBusClient, ILogger<Worker> lo
         {
             logger.LogInformation("Processing ticket {TicketId} - {Title}. DeliveryCount: {DeliveryCount}", message.TicketId, message.Title, args.Message.DeliveryCount);
 
-            //Ticket processing logic goes here. For example, you might want to save the ticket to a database or perform some other business logic.
+            var command = new CreateTicketCommand(message.TicketId, message.Title, message.Description, message.Status, message.OccurredAt);
+
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
+
+            await bus.InvokeAsync(command, args.CancellationToken);
 
             await args.CompleteMessageAsync(args.Message, args.CancellationToken);
         }

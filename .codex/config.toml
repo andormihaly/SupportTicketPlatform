@@ -5,11 +5,5 @@ url = "https://learn.microsoft.com/api/mcp"
 command = "dotnet-roslyn-mcp"
 args = [
   "--solution",
-  "SupportTicketPlatform.slnx"
+  "AiDotNet.slnx"
 ]
-
-[mcp_servers.dotnet-roslyn.tools.get_project_info]
-approval_mode = "approve"
-
-[mcp_servers.dotnet-roslyn.tools.get_dependency_graph]
-approval_mode = "approve"

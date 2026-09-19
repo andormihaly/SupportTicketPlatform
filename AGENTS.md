@@ -100,7 +100,7 @@ Use secure defaults.
 
 ## Testing
 
-Maintain or add tests when behavior changes.
+Maintain  tests when behavior changes.
 
 Prefer focused tests that verify observable behavior.
 
