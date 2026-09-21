@@ -5,5 +5,5 @@ url = "https://learn.microsoft.com/api/mcp"
 command = "dotnet-roslyn-mcp"
 args = [
   "--solution",
-  "AiDotNet.slnx"
+  "SupportTicketPlatform.slnx"
 ]

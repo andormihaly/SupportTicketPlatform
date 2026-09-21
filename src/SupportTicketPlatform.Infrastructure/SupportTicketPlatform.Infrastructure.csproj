@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SupportTicketPlatform.Application\SupportTicketPlatform.Application.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatform.Persistence\SupportTicketPlatform.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

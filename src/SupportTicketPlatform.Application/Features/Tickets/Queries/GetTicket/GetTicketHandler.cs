@@ -1,11 +1,11 @@
-using SupportTicketPlatform.Domain.Entities;
+using SupportTicketPlatform.Application.Interfaces;
 
 namespace SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 
-public sealed class GetTicketHandler
+public sealed class GetTicketHandler(ITicketReader ticketReader)
 {
-    public Ticket? Handle(GetTicketQuery query)
+    public Task<TicketResponse?> Handle(GetTicketQuery query, CancellationToken cancellationToken)
     {
-        return null;
+        return ticketReader.GetByIdAsync(query.Id, cancellationToken);
     }
 }

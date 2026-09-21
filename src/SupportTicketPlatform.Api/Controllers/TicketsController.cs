@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
-using SupportTicketPlatform.Domain.Entities;
 using Wolverine;
 
 namespace SupportTicketPlatform.Api.Controllers;
@@ -19,9 +18,9 @@ public sealed class TicketsController(IMessageBus bus) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id)
+    public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var ticket = await bus.InvokeAsync<Ticket?>(new GetTicketQuery(id));
+        var ticket = await bus.InvokeAsync<TicketResponse?>(new GetTicketQuery(id), cancellationToken);
 
         return ticket is null ? NotFound() : Ok(ticket);
     }
