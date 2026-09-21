@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateResolution;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTickets;
@@ -10,6 +11,22 @@ namespace SupportTicketPlatform.Api.Controllers;
 [Route("api/tickets")]
 public sealed class TicketsController(IMessageBus bus) : ControllerBase
 {
+    [HttpPost("{id:guid}/resolution")]
+    public async Task<IActionResult> CreateResolution(Guid id, CreateResolutionRequest request, CancellationToken cancellationToken)
+    {
+        var result = await bus.InvokeAsync<CreateResolutionResult>(
+            new CreateResolutionCommand(id, request.Content), cancellationToken);
+
+        return result switch
+        {
+            CreateResolutionResult.TicketNotFound => NotFound(),
+            CreateResolutionResult.ResolutionAlreadyExists => Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "The ticket already has a resolution."),
+            _ => NoContent()
+        };
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(CreateTicketCommand command)
     {

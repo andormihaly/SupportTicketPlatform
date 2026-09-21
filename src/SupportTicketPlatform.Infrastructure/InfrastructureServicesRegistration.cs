@@ -19,6 +19,7 @@ public static class InfrastructureServicesRegistration
         services.AddSingleton(dataSource);
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dataSource, npgsqlOptions => npgsqlOptions.UseVector()));
         services.AddScoped<ITicketReader, TicketReader>();
+        services.AddScoped<ITicketRepository, TicketRepository>();
 
         return services;
     }
