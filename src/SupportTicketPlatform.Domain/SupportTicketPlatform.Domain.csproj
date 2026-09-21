@@ -4,4 +4,8 @@
    
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Pgvector" />
+  </ItemGroup>
+
 </Project>

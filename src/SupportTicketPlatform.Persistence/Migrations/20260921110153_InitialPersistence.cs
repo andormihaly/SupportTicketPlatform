@@ -4,10 +4,10 @@ using Pgvector;
 
 #nullable disable
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Migrations
+namespace SupportTicketPlatform.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialWorkerPersistence : Migration
+    public partial class InitialPersistence : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

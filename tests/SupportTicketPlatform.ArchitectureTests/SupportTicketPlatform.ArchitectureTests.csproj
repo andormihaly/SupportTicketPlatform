@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\SupportTicketPlatform.Api\SupportTicketPlatform.Api.csproj" />
     <ProjectReference Include="..\..\src\SupportTicketPlatform.Application\SupportTicketPlatform.Application.csproj" />
-    <ProjectReference Include="..\..\src\SupportTicketPlatform.Domain\SupportTicketPlatform.Domain.csproj" />
     <ProjectReference Include="..\..\src\SupportTicketPlatform.Infrastructure\SupportTicketPlatform.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using SupportTicketPlatform.Worker.Domain.Entities;
-using SupportTicketPlatform.Worker.Application.Interfaces;
-using SupportTicketPlatform.Worker.Domain.Common;
+using SupportTicketPlatform.Domain.Common;
+using SupportTicketPlatform.Domain.Entities;
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Persistence;
+namespace SupportTicketPlatform.Persistence;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider timeProvider): DbContext(options), IAppDbContext
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider timeProvider) : DbContext(options)
 {
     public DbSet<Ticket> Tickets => Set<Ticket>();
     public DbSet<Resolution> Resolutions => Set<Resolution>();
@@ -16,8 +15,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TimePro
         base.OnModelCreating(modelBuilder);
     }
 
-    public override async Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = timeProvider.GetUtcNow();
 

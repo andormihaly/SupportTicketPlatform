@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\SupportTicketPlatform.Persistence\SupportTicketPlatform.Persistence.csproj" />
     <ProjectReference Include="..\SupportTicketPlatForm.Worker.Application\SupportTicketPlatform.Worker.Application.csproj" />
   </ItemGroup>
 
@@ -19,11 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Pgvector.EntityFrameworkCore" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="MigrationScripts\" />
-    <Folder Include="Persistence\Migrations\" />
   </ItemGroup>
 
   <PropertyGroup>

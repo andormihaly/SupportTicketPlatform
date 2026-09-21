@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SupportTicketPlatform.Contracts\SupportTicketPlatform.Contracts.csproj" />
-    <ProjectReference Include="..\SupportTicketPlatform.Domain\SupportTicketPlatform.Domain.csproj" />
+    <ProjectReference Include="..\SupportTicketPlatForm.Domain\SupportTicketPlatform.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

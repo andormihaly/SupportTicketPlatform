@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SupportTicketPlatform.Worker.Domain.Entities;
-using SupportTicketPlatform.Worker.Infrastructure.Persistence.Converters;
+using SupportTicketPlatform.Domain.Entities;
 
-namespace SupportTicketPlatForm.Worker.Infrastructure.Persistence.Configurations;
+namespace SupportTicketPlatForm.Persistence.Configurations;
 
 public sealed class TicketConfiguration : IEntityTypeConfiguration<Ticket>
 {
@@ -25,6 +24,6 @@ public sealed class TicketConfiguration : IEntityTypeConfiguration<Ticket>
 
         builder.Property(x => x.LastModifiedAt);
 
-        builder.Property(x => x.Embedding).HasConversion<VectorValueConverter>().HasColumnType("vector(1536)");
+        builder.Property(x => x.Embedding).HasColumnType("vector(1536)");
     }
 }

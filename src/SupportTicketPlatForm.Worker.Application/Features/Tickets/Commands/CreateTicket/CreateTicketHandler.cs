@@ -1,5 +1,6 @@
 using SupportTicketPlatform.Worker.Application.Interfaces;
-using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Domain.Entities;
+using Pgvector;
 
 namespace SupportTicketPlatform.Worker.Application.Features.Tickets.Commands.CreateTicket;
 
@@ -20,7 +21,7 @@ public sealed class CreateTicketHandler(ITicketRepository ticketRepository, IEmb
             Description = command.Description,
             Status = status,
             OccurredAt = command.OccurredAt.ToUniversalTime(),
-            Embedding = embedding
+            Embedding = new Vector(embedding)
         };
 
         await ticketRepository.AddAsync(ticket, cancellationToken);

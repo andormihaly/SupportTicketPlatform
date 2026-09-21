@@ -1,7 +1,7 @@
-using SupportTicketPlatform.Worker.Domain.Common;
-using System.Numerics;
+using Pgvector;
+using SupportTicketPlatform.Domain.Common;
 
-namespace SupportTicketPlatform.Worker.Domain.Entities;
+namespace SupportTicketPlatform.Domain.Entities;
 
 public sealed class Ticket : AuditableEntity
 {
@@ -14,5 +14,5 @@ public sealed class Ticket : AuditableEntity
     public DateTimeOffset OccurredAt { get; set; }
     public Resolution? Resolution { get; set; }
 
-    public float[]? Embedding { get; set; }
+    public Vector? Embedding { get; set; }
 }

@@ -1,4 +1,4 @@
-using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Domain.Entities;
 
 namespace SupportTicketPlatform.Worker.Application.Interfaces;
 

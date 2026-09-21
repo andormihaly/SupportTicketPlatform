@@ -2,19 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
-using SupportTicketPlatform.Worker.Infrastructure.Persistence;
+using SupportTicketPlatform.Persistence;
 
 #nullable disable
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Migrations
+namespace SupportTicketPlatform.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260921110153_InitialPersistence")]
+    partial class InitialPersistence
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,7 +26,7 @@ namespace SupportTicketPlatform.Worker.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SupportTicketPlatform.Worker.Domain.Entities.Resolution", b =>
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Resolution", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +54,7 @@ namespace SupportTicketPlatform.Worker.Infrastructure.Migrations
                     b.ToTable("Resolutions", (string)null);
                 });
 
-            modelBuilder.Entity("SupportTicketPlatform.Worker.Domain.Entities.Ticket", b =>
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Ticket", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,18 +92,18 @@ namespace SupportTicketPlatform.Worker.Infrastructure.Migrations
                     b.ToTable("Tickets", (string)null);
                 });
 
-            modelBuilder.Entity("SupportTicketPlatform.Worker.Domain.Entities.Resolution", b =>
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Resolution", b =>
                 {
-                    b.HasOne("SupportTicketPlatform.Worker.Domain.Entities.Ticket", "Ticket")
+                    b.HasOne("SupportTicketPlatform.Domain.Entities.Ticket", "Ticket")
                         .WithOne("Resolution")
-                        .HasForeignKey("SupportTicketPlatform.Worker.Domain.Entities.Resolution", "TicketId")
+                        .HasForeignKey("SupportTicketPlatform.Domain.Entities.Resolution", "TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Ticket");
                 });
 
-            modelBuilder.Entity("SupportTicketPlatform.Worker.Domain.Entities.Ticket", b =>
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Ticket", b =>
                 {
                     b.Navigation("Resolution");
                 });

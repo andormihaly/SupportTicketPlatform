@@ -1,5 +1,5 @@
 using FluentValidation;
-using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Domain.Entities;
 
 namespace SupportTicketPlatform.Worker.Application.Features.Tickets.Commands.CreateTicket;
 

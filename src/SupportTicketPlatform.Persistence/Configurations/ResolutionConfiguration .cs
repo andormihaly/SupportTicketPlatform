@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Domain.Entities;
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Persistence.Configurations;
+namespace SupportTicketPlatform.Persistence.Configurations;
 
 public sealed class ResolutionConfiguration : IEntityTypeConfiguration<Resolution>
 {

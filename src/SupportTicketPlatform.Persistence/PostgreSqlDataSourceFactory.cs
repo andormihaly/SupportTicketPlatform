@@ -1,8 +1,9 @@
 using Azure.Core;
 using Azure.Identity;
 using Npgsql;
+using Pgvector;
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Persistence;
+namespace SupportTicketPlatform.Persistence;
 
 public static class PostgreSqlDataSourceFactory
 {

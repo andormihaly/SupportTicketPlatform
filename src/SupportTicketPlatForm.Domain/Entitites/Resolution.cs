@@ -1,6 +1,6 @@
-using SupportTicketPlatform.Worker.Domain.Common;
+using SupportTicketPlatform.Domain.Common;
 
-namespace SupportTicketPlatform.Worker.Domain.Entities;
+namespace SupportTicketPlatform.Domain.Entities;
 
 public sealed class Resolution : AuditableEntity
 {

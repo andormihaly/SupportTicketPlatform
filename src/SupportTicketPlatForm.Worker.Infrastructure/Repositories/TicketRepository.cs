@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using SupportTicketPlatform.Worker.Application.Interfaces;
-using SupportTicketPlatform.Worker.Domain.Entities;
+using SupportTicketPlatform.Domain.Entities;
+using SupportTicketPlatform.Persistence;
 
-namespace SupportTicketPlatform.Worker.Infrastructure.Persistence.Repositories;
+namespace SupportTicketPlatform.Worker.Infrastructure.Repositories;
 
 public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
 {
