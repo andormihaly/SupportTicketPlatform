@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
+using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTickets;
 using Wolverine;
 
 namespace SupportTicketPlatform.Api.Controllers;
@@ -23,5 +24,14 @@ public sealed class TicketsController(IMessageBus bus) : ControllerBase
         var ticket = await bus.InvokeAsync<TicketResponse?>(new GetTicketQuery(id), cancellationToken);
 
         return ticket is null ? NotFound() : Ok(ticket);
+    }
+
+    [HttpGet("{id:guid}/similar")]
+    public async Task<IActionResult> GetSimilar(Guid id, CancellationToken cancellationToken)
+    {
+        var tickets = await bus.InvokeAsync<IReadOnlyList<SimilarTicketResponse>?>(
+            new GetSimilarTicketsQuery(id), cancellationToken);
+
+        return tickets is null ? NotFound() : Ok(tickets);
     }
 }
