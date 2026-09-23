@@ -26,13 +26,12 @@ public sealed class TicketsController(IMessageBus bus) : ControllerBase
             _ => NoContent()
         };
     }
-
     [HttpPost]
-    public async Task<IActionResult> Create(CreateTicketCommand command)
+    public async Task<IActionResult> Create(CreateTicketCommand command, CancellationToken cancellationToken)
     {
-        await bus.InvokeAsync(command);
+        var ticketId = await bus.InvokeAsync<Guid>(command, cancellationToken);
 
-        return Accepted();
+        return Accepted(new { id = ticketId });
     }
 
     [HttpGet("{id:guid}")]

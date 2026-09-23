@@ -8,19 +8,13 @@ public sealed class CreateTicketHandler(ITicketMessagePublisher ticketMessagePub
 {
     public async Task<Guid> Handle(CreateTicketCommand command, CancellationToken cancellationToken)
     {
-        var ticket = new Ticket
-        {
-            Id = Guid.NewGuid(),
-            Title = command.Title,
-            Description = command.Description,
-            Status = TicketStatus.Open,
-            CreatedAt = DateTimeOffset.UtcNow
-        };
+        var ticketId = Guid.NewGuid();
+        var occurredAt = DateTimeOffset.UtcNow;
 
-        var message = new TicketCreated(ticket.Id, ticket.Title, ticket.Description, ticket.Status.ToString(), ticket.CreatedAt);
+        var message = new TicketCreated(ticketId, command.Title, command.Description, TicketStatus.Open.ToString(), occurredAt);
 
         await ticketMessagePublisher.PublishAsync(message, cancellationToken);
 
-        return ticket.Id;
+        return ticketId;
     }
 }

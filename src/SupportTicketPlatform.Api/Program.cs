@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using ImTools;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
@@ -9,6 +10,7 @@ using SupportTicketPlatform.Application;
 using SupportTicketPlatform.Application.Messaging;
 using SupportTicketPlatform.Infrastructure;
 using SupportTicketPlatform.Infrastructure.Messaging;
+using SupportTicketPlatform.Persistence;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,7 @@ if (!string.IsNullOrWhiteSpace(keyVaultUri))
 builder.Host.UseWolverine(options =>
 {
     options.Discovery.IncludeAssembly(typeof(AssemblyReference).Assembly);
+    options.CodeGeneration.AlwaysUseServiceLocationFor<AppDbContext>();
 });
 
 builder.Services.AddSingleton(_ => new ServiceBusClient(builder.Configuration["ServiceBus:ConnectionString"]));
