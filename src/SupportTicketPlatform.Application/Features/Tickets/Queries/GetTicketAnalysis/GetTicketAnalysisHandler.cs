@@ -2,11 +2,11 @@ using SupportTicketPlatform.Application.Interfaces;
 
 namespace SupportTicketPlatform.Api.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
 
-public sealed class GetTicketAnalysisHandler(ITicketReader ticketReader)
+public sealed class GetTicketAnalysisHandler(ITicketRepository ticketRepository)
 {
     public async Task<TicketAnalysisResponse?> Handle(GetTicketAnalysisQuery query, CancellationToken cancellationToken)
     {
-        var analysis = await ticketReader.GetAnalysisAsync(query.TicketId, cancellationToken);
+        var analysis = await ticketRepository.GetAnalysisAsync(query.TicketId, cancellationToken);
 
         if (analysis is null)
             return null;

@@ -1,6 +1,8 @@
+using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using SupportTicketPlatform.Application.Interfaces;
 using SupportTicketPlatform.Infrastructure.Repositories;
 using SupportTicketPlatform.Persistence;
@@ -18,8 +20,19 @@ public static class InfrastructureServicesRegistration
 
         services.AddSingleton(dataSource);
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dataSource, npgsqlOptions => npgsqlOptions.UseVector()));
-        services.AddScoped<ITicketReader, TicketReader>();
         services.AddScoped<ITicketRepository, TicketRepository>();
+
+        var redisConnectionString = configuration.GetConnectionString("RedisConnectionString")  ?? throw new InvalidOperationException("Redis connection string is missing.");
+
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+        {
+            var options = ConfigurationOptions.Parse(redisConnectionString);
+            options.Ssl = true;
+            options.Protocol = RedisProtocol.Resp3;
+            options.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential()).GetAwaiter().GetResult();
+
+            return ConnectionMultiplexer.Connect(options);
+        });
 
         return services;
     }
