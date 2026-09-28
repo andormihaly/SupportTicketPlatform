@@ -89,6 +89,33 @@ namespace SupportTicketPlatform.Persistence.Migrations
                     b.ToTable("Tickets", (string)null);
                 });
 
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.TicketAnalysis", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TicketId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketId")
+                        .IsUnique();
+
+                    b.ToTable("TicketAnalyses", (string)null);
+                });
+
             modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Resolution", b =>
                 {
                     b.HasOne("SupportTicketPlatform.Domain.Entities.Ticket", "Ticket")
@@ -100,8 +127,21 @@ namespace SupportTicketPlatform.Persistence.Migrations
                     b.Navigation("Ticket");
                 });
 
+            modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.TicketAnalysis", b =>
+                {
+                    b.HasOne("SupportTicketPlatform.Domain.Entities.Ticket", "Ticket")
+                        .WithOne("Analysis")
+                        .HasForeignKey("SupportTicketPlatform.Domain.Entities.TicketAnalysis", "TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+                });
+
             modelBuilder.Entity("SupportTicketPlatform.Domain.Entities.Ticket", b =>
                 {
+                    b.Navigation("Analysis");
+
                     b.Navigation("Resolution");
                 });
 #pragma warning restore 612, 618

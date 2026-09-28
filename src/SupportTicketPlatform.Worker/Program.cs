@@ -13,7 +13,8 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<TicketWorker>();
+builder.Services.AddHostedService<TicketAnalysisWorker>();
 
 builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["KeyVaultUri"]!), new DefaultAzureCredential());
 

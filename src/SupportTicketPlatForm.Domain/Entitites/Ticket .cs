@@ -14,5 +14,7 @@ public sealed class Ticket : AuditableEntity
     public DateTimeOffset OccurredAt { get; set; }
     public Resolution? Resolution { get; set; }
 
+    public TicketAnalysis? Analysis { get; set; }
+
     public Vector? Embedding { get; set; }
 }

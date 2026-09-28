@@ -22,4 +22,5 @@ public sealed class FoundryOptions
     public string ProjectEndpoint { get; set; } = string.Empty;
     public string OpenAIEndpoint { get; set; } = string.Empty;
     public string EmbeddingDeployment { get; set; } = string.Empty;
+    public string TicketAnalysisDeployment { get; set; } = string.Empty;
 }

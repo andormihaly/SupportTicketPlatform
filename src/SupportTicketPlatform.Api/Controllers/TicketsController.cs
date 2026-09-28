@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using SupportTicketPlatform.Api.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
+using SupportTicketPlatform.Application.Features.Tickets.Commands.AnalyzeTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateResolution;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
-using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTickets;
+using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 using Wolverine;
 
 namespace SupportTicketPlatform.Api.Controllers;
@@ -11,6 +13,22 @@ namespace SupportTicketPlatform.Api.Controllers;
 [Route("api/tickets")]
 public sealed class TicketsController(IMessageBus bus) : ControllerBase
 {
+    [HttpPost("{ticketId:guid}/analysis")]
+    public async Task<IActionResult> RequestAnalysis(Guid ticketId, CancellationToken cancellationToken)
+    {
+        await bus.InvokeAsync(new AnalyzeTicketCommand(ticketId), cancellationToken);
+
+        return Accepted();
+    }
+
+    [HttpGet("{ticketId:guid}/analysis")]
+    public async Task<IActionResult> GetAnalysis(Guid ticketId, CancellationToken cancellationToken)
+    {
+        var analysis = await bus.InvokeAsync<TicketAnalysisResponse?>(new GetTicketAnalysisQuery(ticketId), cancellationToken);
+
+        return analysis is null ? NotFound() : Ok(analysis);
+    }
+
     [HttpPost("{id:guid}/resolution")]
     public async Task<IActionResult> CreateResolution(Guid id, CreateResolutionRequest request, CancellationToken cancellationToken)
     {

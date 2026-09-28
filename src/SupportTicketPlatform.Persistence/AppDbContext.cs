@@ -8,6 +8,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TimePro
 {
     public DbSet<Ticket> Tickets => Set<Ticket>();
     public DbSet<Resolution> Resolutions => Set<Resolution>();
+    public DbSet<TicketAnalysis> TicketAnalyses => Set<TicketAnalysis>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

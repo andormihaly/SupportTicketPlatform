@@ -25,7 +25,10 @@ public sealed class TicketReader(AppDbContext dbContext) : ITicketReader
                 ticket.Resolution == null ? null : new ResolutionResponse(ticket.Resolution.Content)))
             .SingleOrDefaultAsync(cancellationToken);
     }
-
+    public async Task<TicketAnalysis?> GetAnalysisAsync(Guid ticketId, CancellationToken cancellationToken)
+    {
+        return await dbContext.TicketAnalyses.AsNoTracking().SingleOrDefaultAsync(x => x.TicketId == ticketId, cancellationToken);
+    }
     public async Task<IReadOnlyList<SimilarTicketResponse>?> GetSimilarAsync(Guid id, CancellationToken cancellationToken)
     {
         var source = await dbContext.Tickets
