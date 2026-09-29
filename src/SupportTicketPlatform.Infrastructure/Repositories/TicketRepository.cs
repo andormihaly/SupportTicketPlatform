@@ -6,10 +6,12 @@ using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 using SupportTicketPlatform.Application.Interfaces;
 using SupportTicketPlatform.Domain.Entities;
 using SupportTicketPlatform.Persistence;
+using SupportTicketPlatform.Persistence.Redis;
+using System.Numerics.Tensors;
 
 namespace SupportTicketPlatform.Infrastructure.Repositories;
 
-public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
+public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache) : ITicketRepository
 {
     public Task<Ticket?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -56,18 +58,36 @@ public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
         if (source.Embedding is null)
             return [];
 
-        var tickets = await FindSimilarResolvedTicketsAsync(source.Embedding.ToArray(), 5, cancellationToken, id);
+        var embedding = source.Embedding.ToArray();
+        var vector = new Vector(embedding);
+
+        var cachedTickets = await similarityCache.GetAsync(embedding);
+
+        if (cachedTickets is not null)
+        {
+            return cachedTickets
+                .Select(ticket => new SimilarTicketResponse(
+                    ticket.Id,
+                    ticket.Title,
+                    ticket.Description,
+                    ticket.Resolution!.Content,
+                    TensorPrimitives.CosineSimilarity(ticket.Embedding!.ToArray(), source.Embedding.ToArray())))
+                .ToList();
+        }
+
+        var tickets = await FindSimilarResolvedTicketsAsync(embedding, 5, cancellationToken, id);
+
+        await similarityCache.SetAsync(embedding, tickets, id);
 
         return tickets
             .Select(ticket => new SimilarTicketResponse(
-                ticket.Id,
-                ticket.Title,
-                ticket.Description,
-                ticket.Resolution!.Content,
-                1 - ticket.Embedding!.CosineDistance(source.Embedding)))
-            .ToList();
+            ticket.Id,
+            ticket.Title,
+            ticket.Description,
+            ticket.Resolution!.Content,
+            TensorPrimitives.CosineSimilarity(ticket.Embedding!.ToArray(), source.Embedding.ToArray())))
+        .ToList();
     }
-
 
 
     public async Task<IReadOnlyList<Ticket>> FindSimilarResolvedTicketsAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? excludeTicketId = null)

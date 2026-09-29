@@ -6,7 +6,9 @@ using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
+using StackExchange.Redis;
 using SupportTicketPlatform.Persistence;
+using SupportTicketPlatform.Persistence.Redis;
 using SupportTicketPlatform.Worker.Application.Configuration;
 using SupportTicketPlatform.Worker.Application.Interfaces;
 using SupportTicketPlatform.Worker.Infrastructure.AI;
@@ -57,6 +59,22 @@ public static class InfrastructureServicesRegistration
             return new EmbeddingClient(foundry.EmbeddingDeployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(foundry.OpenAIEndpoint) });
         });
 
+        var redisConnectionString = configuration.GetConnectionString("RedisConnectionString") ?? throw new InvalidOperationException("Redis connection string is missing.");
+
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+        {
+            var configuration = ConfigurationOptions.Parse(redisConnectionString);
+            configuration.Ssl = true;
+            configuration.Protocol = RedisProtocol.Resp3;
+            configuration.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential()).GetAwaiter().GetResult();
+
+            var redis = ConnectionMultiplexer.Connect(configuration);
+            RedisSimilarityCacheIndex.CreateAsync(redis).GetAwaiter().GetResult();
+
+            return redis;
+        });
+
+        services.AddSingleton<RedisSimilarityCache>();
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<IEmbeddingService, AzureOpenAiEmbeddingService>();
         services.AddScoped<ITicketAnalysisService, AzureOpenAiTicketAnalysisService>();

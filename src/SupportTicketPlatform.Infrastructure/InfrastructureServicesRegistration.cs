@@ -6,6 +6,7 @@ using StackExchange.Redis;
 using SupportTicketPlatform.Application.Interfaces;
 using SupportTicketPlatform.Infrastructure.Repositories;
 using SupportTicketPlatform.Persistence;
+using SupportTicketPlatform.Persistence.Redis;
 
 namespace SupportTicketPlatform.Infrastructure;
 
@@ -31,8 +32,14 @@ public static class InfrastructureServicesRegistration
             options.Protocol = RedisProtocol.Resp3;
             options.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential()).GetAwaiter().GetResult();
 
-            return ConnectionMultiplexer.Connect(options);
+            var redis = ConnectionMultiplexer.Connect(options);
+
+            RedisSimilarityCacheIndex.CreateAsync(redis).GetAwaiter().GetResult();
+
+            return redis;
         });
+
+        services.AddSingleton<RedisSimilarityCache>();
 
         return services;
     }

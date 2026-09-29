@@ -10,6 +10,7 @@ public sealed class WorkerOptions
 public sealed class ConnectionStringsOptions
 {
     public string PostgreSQLConnectionString { get; set; } = string.Empty;
+    public string RedisConnectionString { get; set; } = string.Empty;
 }
 
 public sealed class ServiceBusOptions

@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using Pgvector.EntityFrameworkCore;
-using SupportTicketPlatform.Worker.Application.Interfaces;
 using SupportTicketPlatform.Domain.Entities;
 using SupportTicketPlatform.Persistence;
+using SupportTicketPlatform.Persistence.Redis;
+using SupportTicketPlatform.Worker.Application.Interfaces;
 
 namespace SupportTicketPlatform.Worker.Infrastructure.Repositories;
 
-public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
+public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache) : ITicketRepository
 {
     public Task<bool> ExistsAsync(Guid ticketId, CancellationToken cancellationToken)
     {
@@ -32,11 +33,26 @@ public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
+ 
+
     public async Task<IReadOnlyList<Ticket>> FindSimilarResolvedTicketsAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? excludeTicketId = null)
     {
+        if (excludeTicketId.HasValue)
+        {
+            var cachedTicketsById = await similarityCache.GetByIdAsync(excludeTicketId.Value);
+
+            if (cachedTicketsById is not null)
+                return cachedTicketsById;
+        }
+
+        var cachedTickets = await similarityCache.GetAsync(embedding);
+
+        if (cachedTickets is not null)
+            return cachedTickets;
+
         var vector = new Vector(embedding);
 
-        return await dbContext.Tickets
+        var tickets = await dbContext.Tickets
             .AsNoTracking()
             .Include(x => x.Resolution)
             .Where(ticket => (!excludeTicketId.HasValue || ticket.Id != excludeTicketId.Value)
@@ -47,5 +63,9 @@ public sealed class TicketRepository(AppDbContext dbContext) : ITicketRepository
             .ThenBy(ticket => ticket.Id)
             .Take(limit)
             .ToListAsync(cancellationToken);
+
+        await similarityCache.SetAsync(embedding, tickets, excludeTicketId);
+
+        return tickets;
     }
 }
