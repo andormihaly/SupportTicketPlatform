@@ -2,11 +2,15 @@ using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI;
+using OpenAI.Embeddings;
 using StackExchange.Redis;
 using SupportTicketPlatform.Application.Interfaces;
+using SupportTicketPlatform.Infrastructure.AI;
 using SupportTicketPlatform.Infrastructure.Repositories;
 using SupportTicketPlatform.Persistence;
 using SupportTicketPlatform.Persistence.Redis;
+using System.ClientModel.Primitives;
 
 namespace SupportTicketPlatform.Infrastructure;
 
@@ -40,6 +44,25 @@ public static class InfrastructureServicesRegistration
         });
 
         services.AddSingleton<RedisSimilarityCache>();
+
+#pragma warning disable OPENAI001
+        services.AddSingleton(_ =>
+        {
+            var deployment = configuration["Foundry:EmbeddingDeployment"];
+            var endpoint = configuration["Foundry:OpenAIEndpoint"];
+
+            if (string.IsNullOrWhiteSpace(deployment))
+                throw new InvalidOperationException("Foundry:EmbeddingDeployment is required for embeddings.");
+
+            if (string.IsNullOrWhiteSpace(endpoint))
+                throw new InvalidOperationException("Foundry:OpenAIEndpoint is required for embeddings.");
+
+            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://ai.azure.com/.default");
+
+            return new EmbeddingClient(deployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(endpoint) });
+        });
+#pragma warning restore OPENAI001
+        services.AddScoped<IEmbeddingService, AzureOpenAiEmbeddingService>();
 
         return services;
     }

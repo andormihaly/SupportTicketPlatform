@@ -4,6 +4,7 @@ using SupportTicketPlatform.Application.Features.Tickets.Commands.AnalyzeTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateResolution;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTickets;
+using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTicketsByText;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
 using Wolverine;
 
@@ -67,5 +68,13 @@ public sealed class TicketsController(IMessageBus bus) : ControllerBase
             new GetSimilarTicketsQuery(id), cancellationToken);
 
         return tickets is null ? NotFound() : Ok(tickets);
+    }
+
+    [HttpPost("similar")]
+    public async Task<IActionResult> GetSimilarByText(GetSimilarTicketsByTextQuery query, CancellationToken cancellationToken)
+    {
+        var tickets = await bus.InvokeAsync<IReadOnlyList<SimilarTicketResponse>>(query, cancellationToken);
+
+        return Ok(tickets);
     }
 }

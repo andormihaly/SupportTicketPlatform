@@ -40,11 +40,15 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
                 ticket.Resolution == null ? null : new ResolutionResponse(ticket.Resolution.Content)))
             .SingleOrDefaultAsync(cancellationToken);
     }
+
     public async Task<TicketAnalysis?> GetAnalysisAsync(Guid ticketId, CancellationToken cancellationToken)
     {
-        return await dbContext.TicketAnalyses.AsNoTracking().SingleOrDefaultAsync(x => x.TicketId == ticketId, cancellationToken);
+        return await dbContext.TicketAnalyses
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.TicketId == ticketId, cancellationToken);
     }
-    public async Task<IReadOnlyList<SimilarTicketResponse>?> GetSimilarAsync(Guid id, CancellationToken cancellationToken)
+
+    public async Task<IReadOnlyList<SimilarTicketResponse>?> GetSimilarAsync(Guid id, int limit, CancellationToken cancellationToken)
     {
         var source = await dbContext.Tickets
             .AsNoTracking()
@@ -58,37 +62,36 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
         if (source.Embedding is null)
             return [];
 
-        var embedding = source.Embedding.ToArray();
-        var vector = new Vector(embedding);
+        return await GetSimilarAsync(source.Embedding.ToArray(), limit, cancellationToken, id);
+    }
 
-        var cachedTickets = await similarityCache.GetAsync(embedding);
+    public async Task<IReadOnlyList<SimilarTicketResponse>> GetSimilarAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? sourceTicketId = null)
+    {
+        var tickets = sourceTicketId.HasValue
+            ? await similarityCache.GetByIdAsync(sourceTicketId.Value)
+            : null;
 
-        if (cachedTickets is not null)
+        tickets ??= await similarityCache.GetAsync(embedding);
+
+        if (tickets is null)
         {
-            return cachedTickets
-                .Select(ticket => new SimilarTicketResponse(
-                    ticket.Id,
-                    ticket.Title,
-                    ticket.Description,
-                    ticket.Resolution!.Content,
-                    TensorPrimitives.CosineSimilarity(ticket.Embedding!.ToArray(), source.Embedding.ToArray())))
-                .ToList();
+            tickets = await FindSimilarResolvedTicketsAsync(embedding, limit, cancellationToken, sourceTicketId);
+
+            await similarityCache.SetAsync(embedding, tickets, sourceTicketId);
         }
-
-        var tickets = await FindSimilarResolvedTicketsAsync(embedding, 5, cancellationToken, id);
-
-        await similarityCache.SetAsync(embedding, tickets, id);
 
         return tickets
             .Select(ticket => new SimilarTicketResponse(
-            ticket.Id,
-            ticket.Title,
-            ticket.Description,
-            ticket.Resolution!.Content,
-            TensorPrimitives.CosineSimilarity(ticket.Embedding!.ToArray(), source.Embedding.ToArray())))
-        .ToList();
+                ticket.Id,
+                ticket.Title,
+                ticket.Description,
+                ticket.Resolution!.Content,
+                TensorPrimitives.CosineSimilarity(ticket.Embedding!.ToArray(), embedding)))
+            .OrderByDescending(ticket => ticket.Similarity)
+            .ThenBy(ticket => ticket.Id)
+            .Take(limit)
+            .ToList();
     }
-
 
     public async Task<IReadOnlyList<Ticket>> FindSimilarResolvedTicketsAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? excludeTicketId = null)
     {
@@ -96,7 +99,7 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
 
         return await dbContext.Tickets
             .AsNoTracking()
-            .Include(x => x.Resolution)
+            .Include(ticket => ticket.Resolution)
             .Where(ticket => (!excludeTicketId.HasValue || ticket.Id != excludeTicketId.Value)
                 && ticket.Status == TicketStatus.Resolved
                 && ticket.Resolution != null

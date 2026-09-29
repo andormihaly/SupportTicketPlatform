@@ -6,6 +6,6 @@ public sealed class GetSimilarTicketsHandler(ITicketRepository ticketRepository)
 {
     public Task<IReadOnlyList<SimilarTicketResponse>?> Handle(GetSimilarTicketsQuery query, CancellationToken cancellationToken)
     {
-        return ticketRepository.GetSimilarAsync(query.Id, cancellationToken);
+        return ticketRepository.GetSimilarAsync(query.Id,3,cancellationToken);
     }
 }
