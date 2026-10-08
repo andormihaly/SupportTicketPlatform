@@ -5,6 +5,8 @@ public sealed class WorkerOptions
     public ConnectionStringsOptions ConnectionStrings { get; set; } = new();
     public ServiceBusOptions ServiceBus { get; set; } = new();
     public FoundryOptions Foundry { get; set; } = new();
+
+    public TicketAnalysisOptions TicketAnalysis { get; set; } = new();
 }
 
 public sealed class ConnectionStringsOptions
@@ -15,7 +17,7 @@ public sealed class ConnectionStringsOptions
 
 public sealed class ServiceBusOptions
 {
-    public string ConnectionString { get; set; } = string.Empty;
+    public string FullyQualifiedNamespace { get; set; } = string.Empty;
 }
 
 public sealed class FoundryOptions
@@ -24,4 +26,9 @@ public sealed class FoundryOptions
     public string OpenAIEndpoint { get; set; } = string.Empty;
     public string EmbeddingDeployment { get; set; } = string.Empty;
     public string TicketAnalysisDeployment { get; set; } = string.Empty;
+}
+
+public sealed class TicketAnalysisOptions
+{
+    public int MaxSimilarTickets { get; set; }
 }

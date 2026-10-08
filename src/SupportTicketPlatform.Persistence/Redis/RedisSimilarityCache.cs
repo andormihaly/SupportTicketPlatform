@@ -5,11 +5,8 @@ using System.Text.Json.Serialization;
 
 namespace SupportTicketPlatform.Persistence.Redis;
 
-public sealed class RedisSimilarityCache(IConnectionMultiplexer redis)
+public sealed class RedisSimilarityCache(IConnectionMultiplexer redis, RedisOptions options)
 {
-    private const double SimilarityThreshold = 0.85;
-    private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(15);
-
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
@@ -46,7 +43,7 @@ public sealed class RedisSimilarityCache(IConnectionMultiplexer redis)
         var distance = (double)fields["distance"];
         var similarity = 1 - distance;
 
-        if (similarity < SimilarityThreshold)
+        if (similarity < options.SimilarityThreshold)
             return null;
 
         var json = (string?)fields[RedisSimilarityCacheIndex.ResultField];
@@ -85,7 +82,7 @@ public sealed class RedisSimilarityCache(IConnectionMultiplexer redis)
         new HashEntry(RedisSimilarityCacheIndex.ResultField, result)
         ]);
 
-        await database.KeyExpireAsync(key, CacheLifetime);
+        await database.KeyExpireAsync(key, TimeSpan.FromMinutes(options.CacheLifetimeMinutes));
     }
 
     private static byte[] ToBytes(float[] embedding)

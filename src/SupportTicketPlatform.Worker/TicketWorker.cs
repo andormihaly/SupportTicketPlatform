@@ -61,6 +61,8 @@ public sealed class TicketWorker(ServiceBusClient serviceBusClient, IServiceScop
             await bus.InvokeAsync(command, args.CancellationToken);
 
             await args.CompleteMessageAsync(args.Message, args.CancellationToken);
+
+            logger.LogInformation("Ticket message processed successfully. TicketId: {TicketId}, MessageId: {MessageId}", message.TicketId, args.Message.MessageId);
         }
         catch (Exception ex)
         {

@@ -5,9 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAI;
 using OpenAI.Embeddings;
 using StackExchange.Redis;
+using SupportTicketPlatform.Application.Configuration;
 using SupportTicketPlatform.Application.Interfaces;
 using SupportTicketPlatform.Infrastructure.AI;
 using SupportTicketPlatform.Infrastructure.Repositories;
+using SupportTicketPlatform.Infrastructure.Telemetry;
 using SupportTicketPlatform.Persistence;
 using SupportTicketPlatform.Persistence.Redis;
 using System.ClientModel.Primitives;
@@ -20,14 +22,24 @@ public static class InfrastructureServicesRegistration
     {
         services.AddSingleton(TimeProvider.System);
 
-        var connectionString = configuration.GetConnectionString("PostgreSQLConnectionString") ?? throw new InvalidOperationException("PostgreSQL connection string is missing.");
-        var dataSource = PostgreSqlDataSourceFactory.Create(connectionString);
+        var apiOptions = new ApiOptions();
+        configuration.Bind(apiOptions);
+       
+        var postgreSqlConnectionString = apiOptions.ConnectionStrings.PostgreSQLConnectionString;
+
+        if (string.IsNullOrWhiteSpace(postgreSqlConnectionString))
+            throw new InvalidOperationException("PostgreSQL connection string is missing.");
+
+        var dataSource = PostgreSqlDataSourceFactory.Create(postgreSqlConnectionString);
 
         services.AddSingleton(dataSource);
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(dataSource, npgsqlOptions => npgsqlOptions.UseVector()));
         services.AddScoped<ITicketRepository, TicketRepository>();
 
-        var redisConnectionString = configuration.GetConnectionString("RedisConnectionString")  ?? throw new InvalidOperationException("Redis connection string is missing.");
+        var redisConnectionString = apiOptions.ConnectionStrings.RedisConnectionString;
+
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+            throw new InvalidOperationException("Redis connection string is missing.");
 
         services.AddSingleton<IConnectionMultiplexer>(_ =>
         {
@@ -43,13 +55,17 @@ public static class InfrastructureServicesRegistration
             return redis;
         });
 
+        var redisOptions = configuration.GetSection("Redis").Get<RedisOptions>() ?? throw new InvalidOperationException("Redis configuration is missing.");
+        services.AddSingleton(redisOptions);
         services.AddSingleton<RedisSimilarityCache>();
+
+        services.AddSingleton<IApplicationTelemetry, OpenTelemetryApplicationTelemetry>();
 
 #pragma warning disable OPENAI001
         services.AddSingleton(_ =>
         {
-            var deployment = configuration["Foundry:EmbeddingDeployment"];
-            var endpoint = configuration["Foundry:OpenAIEndpoint"];
+            var deployment = apiOptions.Foundry.EmbeddingDeployment;
+            var endpoint = apiOptions.Foundry.OpenAIEndpoint;
 
             if (string.IsNullOrWhiteSpace(deployment))
                 throw new InvalidOperationException("Foundry:EmbeddingDeployment is required for embeddings.");
@@ -62,6 +78,7 @@ public static class InfrastructureServicesRegistration
             return new EmbeddingClient(deployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(endpoint) });
         });
 #pragma warning restore OPENAI001
+
         services.AddScoped<IEmbeddingService, AzureOpenAiEmbeddingService>();
 
         return services;

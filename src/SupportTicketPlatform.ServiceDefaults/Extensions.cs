@@ -1,9 +1,12 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -46,6 +49,8 @@ namespace Microsoft.Extensions.Hosting
 
         public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
+            AppContext.SetSwitch("Azure.Experimental.EnableActivitySource", true);
+
             builder.Logging.AddOpenTelemetry(logging =>
             {
                 logging.IncludeFormattedMessage = true;
@@ -57,20 +62,24 @@ namespace Microsoft.Extensions.Hosting
                 {
                     metrics.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
-                        .AddRuntimeInstrumentation();
+                        .AddRuntimeInstrumentation()
+                      .AddMeter("SupportTicketPlatform.Worker.Application");
                 })
                 .WithTracing(tracing =>
                 {
                     tracing.AddSource(builder.Environment.ApplicationName)
+                        .AddSource("Azure.*")
+                        .AddSource("OpenAI.*")
+                        .AddSource("SupportTicketPlatform.Application")
+                        .AddSource("SupportTicketPlatform.Worker.Application")
                         .AddAspNetCoreInstrumentation(tracing =>
                             // Exclude health check requests from tracing
                             tracing.Filter = context =>
                                 !context.Request.Path.StartsWithSegments(HealthEndpointPath)
                                 && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
                         )
-                        // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-                        //.AddGrpcClientInstrumentation()
-                        .AddHttpClientInstrumentation();
+                        .AddHttpClientInstrumentation()
+                        .AddNpgsql();
                 });
 
             builder.AddOpenTelemetryExporters();
@@ -87,12 +96,15 @@ namespace Microsoft.Extensions.Hosting
                 builder.Services.AddOpenTelemetry().UseOtlpExporter();
             }
 
-            // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
-            //if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-            //{
-            //    builder.Services.AddOpenTelemetry()
-            //       .UseAzureMonitor();
-            //}
+            var applicationInsightsConnectionString = builder.Configuration.GetConnectionString("SupportTicketInsights");
+
+            if (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))
+            {
+                builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
+                {
+                    options.ConnectionString = applicationInsightsConnectionString;
+                });
+            }
 
             return builder;
         }

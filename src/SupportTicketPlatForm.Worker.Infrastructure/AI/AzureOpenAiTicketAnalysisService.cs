@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OpenAI.Chat;
 using SupportTicketPlatform.Domain.Entities;
 using SupportTicketPlatform.Worker.Application.Interfaces;
@@ -5,8 +6,7 @@ using System.Text.Json;
 
 namespace SupportTicketPlatform.Worker.Infrastructure.AI;
 
-public sealed class AzureOpenAiTicketAnalysisService(ChatClient chatClient)
-    : ITicketAnalysisService
+public sealed class AzureOpenAiTicketAnalysisService(ChatClient chatClient, ILogger<AzureOpenAiTicketAnalysisService> logger) : ITicketAnalysisService
 {
     private const string SystemPrompt = """
         Provide concise ticket analysis with actionable support steps for the current ticket using only the supplied resolved cases.
@@ -17,14 +17,11 @@ public sealed class AzureOpenAiTicketAnalysisService(ChatClient chatClient)
 
     public async Task<string> GenerateAnalysisAsync(Ticket ticket, IReadOnlyList<Ticket> resolvedTickets, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Generating AI ticket analysis. TicketId: {TicketId}, SimilarTicketCount: {SimilarTicketCount}", ticket.Id, resolvedTickets.Count);
+
         var context = JsonSerializer.Serialize(new
         {
-            CurrentTicket = new
-            {
-                ticket.Id,
-                ticket.Title,
-                ticket.Description
-            },
+            CurrentTicket = new { ticket.Id, ticket.Title, ticket.Description },
             ResolvedCases = resolvedTickets.Select(resolved => new
             {
                 resolved.Id,
@@ -34,22 +31,18 @@ public sealed class AzureOpenAiTicketAnalysisService(ChatClient chatClient)
             })
         });
 
-        var result = await chatClient.CompleteChatAsync([new SystemChatMessage(SystemPrompt),new UserChatMessage(context) ],
-            cancellationToken: cancellationToken);
-
+        var result = await chatClient.CompleteChatAsync([new SystemChatMessage(SystemPrompt), new UserChatMessage(context)], cancellationToken: cancellationToken);
         var completion = result.Value;
 
-        if (completion.FinishReason != ChatFinishReason.Stop ||!string.IsNullOrWhiteSpace(completion.Refusal))
-        {
+        if (completion.FinishReason != ChatFinishReason.Stop || !string.IsNullOrWhiteSpace(completion.Refusal))
             throw new InvalidOperationException("The model did not produce a complete support analysis.");
-        }
 
         var analysis = string.Concat(completion.Content.Select(part => part.Text)).Trim();
 
         if (string.IsNullOrWhiteSpace(analysis))
-        {
             throw new InvalidOperationException("The model returned an empty support analysis.");
-        }
+
+        logger.LogInformation("AI ticket analysis generated successfully. TicketId: {TicketId}", ticket.Id);
 
         return analysis;
     }

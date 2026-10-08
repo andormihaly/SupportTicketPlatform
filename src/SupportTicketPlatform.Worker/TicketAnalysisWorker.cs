@@ -61,6 +61,8 @@ public sealed class TicketAnalysisWorker(ServiceBusClient serviceBusClient, ISer
             await bus.InvokeAsync(command, args.CancellationToken);
 
             await args.CompleteMessageAsync(args.Message, args.CancellationToken);
+
+            logger.LogInformation("Ticket analysis message processed successfully. TicketId: {TicketId}, MessageId: {MessageId}", message.TicketId, args.Message.MessageId);
         }
         catch (Exception ex)
         {

@@ -3,7 +3,8 @@
     "SupportTicketPlatform.Worker": {
       "commandName": "Project",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "AppConfiguration__Endpoint": "https://support-ticket-appconfi.azconfig.io"
       },
       "dotnetRunMessages": true
     },

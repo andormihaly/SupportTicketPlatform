@@ -1,12 +1,11 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
-using ImTools;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 using SupportTicketPlatform.Api.ExceptionHandling;
 using SupportTicketPlatform.Api.Validation;
 using SupportTicketPlatform.Application;
+using SupportTicketPlatform.Application.Configuration;
 using SupportTicketPlatform.Application.Messaging;
 using SupportTicketPlatform.Infrastructure;
 using SupportTicketPlatform.Infrastructure.Messaging;
@@ -15,7 +14,7 @@ using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+
 
 var keyVaultUri = builder.Configuration["KeyVaultUri"];
 
@@ -24,13 +23,42 @@ if (!string.IsNullOrWhiteSpace(keyVaultUri))
     builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
 }
 
+var appConfigurationEndpoint = builder.Configuration["AppConfiguration:Endpoint"];
+
+
+if (!string.IsNullOrWhiteSpace(appConfigurationEndpoint))
+{
+    var credential = new DefaultAzureCredential();
+
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options.Connect(new Uri(appConfigurationEndpoint), credential).ConfigureKeyVault(keyVault =>{keyVault.SetCredential(credential);});
+    });
+}
+
+builder.Services.Configure<ApiOptions>(builder.Configuration);
+
+builder.AddServiceDefaults();
+
 builder.Host.UseWolverine(options =>
 {
     options.Discovery.IncludeAssembly(typeof(AssemblyReference).Assembly);
     options.CodeGeneration.AlwaysUseServiceLocationFor<AppDbContext>();
 });
 
-builder.Services.AddSingleton(_ => new ServiceBusClient(builder.Configuration["ServiceBus:ConnectionString"]));
+builder.Services.AddSingleton(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<ApiOptions>>().Value;
+
+    if (string.IsNullOrWhiteSpace(options.ServiceBus.FullyQualifiedNamespace))
+    {
+        throw new InvalidOperationException( "ServiceBus:FullyQualifiedNamespace is not configured.");
+    }
+
+    return new ServiceBusClient(options.ServiceBus.FullyQualifiedNamespace, new DefaultAzureCredential());
+});
+
+
 builder.Services.AddSingleton<ITicketMessagePublisher, ServiceBusTicketMessagePublisher>();
 
 builder.Services.AddApplicationServices();
@@ -40,9 +68,6 @@ builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpLogging(options => { });
-builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation());
-builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation()).
-    WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddRuntimeInstrumentation());
 
 var app = builder.Build();
 
