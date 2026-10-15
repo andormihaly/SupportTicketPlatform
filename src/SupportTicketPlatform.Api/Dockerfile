@@ -10,6 +10,8 @@ COPY ["src/SupportTicketPlatform.Application/SupportTicketPlatform.Application.c
 COPY ["src/SupportTicketPlatform.Contracts/SupportTicketPlatform.Contracts.csproj", "src/SupportTicketPlatform.Contracts/"]
 COPY ["src/SupportTicketPlatform.Domain/SupportTicketPlatform.Domain.csproj", "src/SupportTicketPlatform.Domain/"]
 COPY ["src/SupportTicketPlatform.Infrastructure/SupportTicketPlatform.Infrastructure.csproj", "src/SupportTicketPlatform.Infrastructure/"]
+COPY ["src/SupportTicketPlatform.Persistence/SupportTicketPlatform.Persistence.csproj", "src/SupportTicketPlatform.Persistence/"]
+COPY ["src/SupportTicketPlatform.ServiceDefaults/SupportTicketPlatform.ServiceDefaults.csproj", "src/SupportTicketPlatform.ServiceDefaults/"]
 RUN dotnet restore "src/SupportTicketPlatform.Api/SupportTicketPlatform.Api.csproj"
 
 
