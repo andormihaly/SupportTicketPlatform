@@ -39,9 +39,7 @@ public sealed class TicketsController(IMessageBus bus) : ControllerBase
         return result switch
         {
             CreateResolutionResult.TicketNotFound => NotFound(),
-            CreateResolutionResult.ResolutionAlreadyExists => Problem(
-                statusCode: StatusCodes.Status409Conflict,
-                title: "The ticket already has a resolution."),
+            CreateResolutionResult.ResolutionAlreadyExists => Problem(statusCode: StatusCodes.Status409Conflict, title: "The ticket already has a resolution."),
             _ => NoContent()
         };
     }
