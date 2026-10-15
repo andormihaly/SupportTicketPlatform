@@ -30,7 +30,7 @@
   </ItemGroup>
 
 <ItemGroup>
-  <ProjectReference Include="..\SupportTicketPlatForm.Domain\SupportTicketPlatform.Domain.csproj" />
+  <ProjectReference Include="..\SupportTicketPlatform.Domain\SupportTicketPlatform.Domain.csproj" />
 </ItemGroup>
 
 <ItemGroup>
