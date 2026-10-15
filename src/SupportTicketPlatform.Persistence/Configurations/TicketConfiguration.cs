@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SupportTicketPlatform.Domain.Entities;
 
-namespace SupportTicketPlatForm.Persistence.Configurations;
+namespace SupportTicketPlatform.Persistence.Configurations;
 
 public sealed class TicketConfiguration : IEntityTypeConfiguration<Ticket>
 {

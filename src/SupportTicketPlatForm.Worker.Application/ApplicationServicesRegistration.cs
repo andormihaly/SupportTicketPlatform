@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SupportTicketPlatForm.Worker.Application;
+namespace SupportTicketPlatform.Worker.Application;
 
 public static class ApplicationServicesRegistration
 {
