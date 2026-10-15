@@ -12,8 +12,12 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
+
 COPY ["src/SupportTicketPlatform.Worker/SupportTicketPlatform.Worker.csproj", "src/SupportTicketPlatform.Worker/"]
 COPY ["src/SupportTicketPlatform.Contracts/SupportTicketPlatform.Contracts.csproj", "src/SupportTicketPlatform.Contracts/"]
+COPY ["src/SupportTicketPlatform.ServiceDefaults/SupportTicketPlatform.ServiceDefaults.csproj", "src/SupportTicketPlatform.ServiceDefaults/"]
+COPY ["src/SupportTicketPlatform.Worker.Application/SupportTicketPlatform.Worker.Application.csproj", "src/SupportTicketPlatform.Worker.Application/"]
+COPY ["src/SupportTicketPlatform.Worker.Infrastructure/SupportTicketPlatform.Worker.Infrastructure.csproj", "src/SupportTicketPlatform.Worker.Infrastructure/"]
 RUN dotnet restore "./src/SupportTicketPlatform.Worker/SupportTicketPlatform.Worker.csproj"
 COPY . .
 WORKDIR "/src/src/SupportTicketPlatform.Worker"
