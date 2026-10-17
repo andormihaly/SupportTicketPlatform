@@ -47,7 +47,7 @@ public static class InfrastructureServicesRegistration
             if (string.IsNullOrWhiteSpace(foundry.OpenAIEndpoint))
                 throw new InvalidOperationException("Foundry:OpenAIEndpoint is required for ticket analysis.");
 
-            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://ai.azure.com/.default");
+            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default");
 
             return new ChatClient(foundry.TicketAnalysisDeployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(foundry.OpenAIEndpoint) });
         });
@@ -62,7 +62,7 @@ public static class InfrastructureServicesRegistration
             if (string.IsNullOrWhiteSpace(foundry.OpenAIEndpoint))
                 throw new InvalidOperationException("Foundry:OpenAIEndpoint is required for embeddings.");
 
-            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://ai.azure.com/.default");
+            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default");
 
             return new EmbeddingClient(foundry.EmbeddingDeployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(foundry.OpenAIEndpoint) });
         });

@@ -73,7 +73,7 @@ public static class InfrastructureServicesRegistration
             if (string.IsNullOrWhiteSpace(endpoint))
                 throw new InvalidOperationException("Foundry:OpenAIEndpoint is required for embeddings.");
 
-            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://ai.azure.com/.default");
+            var tokenPolicy = new BearerTokenPolicy(new DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default");
 
             return new EmbeddingClient(deployment, tokenPolicy, new OpenAIClientOptions { Endpoint = new Uri(endpoint) });
         });
