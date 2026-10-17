@@ -11,7 +11,7 @@ using System.Numerics.Tensors;
 
 namespace SupportTicketPlatform.Infrastructure.Repositories;
 
-public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache) : ITicketRepository
+public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache = null) : ITicketRepository
 {
     public Task<Ticket?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -67,17 +67,17 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
 
     public async Task<IReadOnlyList<SimilarTicketResponse>> GetSimilarAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? sourceTicketId = null)
     {
-        var tickets = sourceTicketId.HasValue
-            ? await similarityCache.GetByIdAsync(sourceTicketId.Value)
-            : null;
+        var tickets = sourceTicketId.HasValue  ? await (similarityCache?.GetByIdAsync(sourceTicketId.Value) ?? Task.FromResult<IReadOnlyList<Ticket>?>(null)) : null;
 
-        tickets ??= await similarityCache.GetAsync(embedding);
+        if (tickets is null && similarityCache is not null)
+            tickets = await similarityCache.GetAsync(embedding);
 
         if (tickets is null)
         {
             tickets = await FindSimilarResolvedTicketsAsync(embedding, limit, cancellationToken, sourceTicketId);
 
-            await similarityCache.SetAsync(embedding, tickets, sourceTicketId);
+            if (similarityCache is not null)
+                await similarityCache.SetAsync(embedding, tickets, sourceTicketId);
         }
 
         return tickets

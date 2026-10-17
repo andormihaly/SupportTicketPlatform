@@ -8,7 +8,7 @@ using SupportTicketPlatform.Worker.Application.Interfaces;
 
 namespace SupportTicketPlatform.Worker.Infrastructure.Repositories;
 
-public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache) : ITicketRepository
+public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCache similarityCache = null) : ITicketRepository
 {
     public Task<bool> ExistsAsync(Guid ticketId, CancellationToken cancellationToken)
     {
@@ -33,22 +33,29 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
- 
 
-    public async Task<IReadOnlyList<Ticket>> FindSimilarResolvedTicketsAsync(float[] embedding, int limit, CancellationToken cancellationToken, Guid? excludeTicketId = null)
+
+    public async Task<IReadOnlyList<Ticket>> FindSimilarResolvedTicketsAsync(
+     float[] embedding,
+     int limit,
+     CancellationToken cancellationToken,
+     Guid? excludeTicketId = null)
     {
-        if (excludeTicketId.HasValue)
+        if (similarityCache is not null)
         {
-            var cachedTicketsById = await similarityCache.GetByIdAsync(excludeTicketId.Value);
+            if (excludeTicketId.HasValue)
+            {
+                var cachedTicketsById = await similarityCache.GetByIdAsync(excludeTicketId.Value);
 
-            if (cachedTicketsById is not null)
-                return cachedTicketsById;
+                if (cachedTicketsById is not null)
+                    return cachedTicketsById;
+            }
+
+            var cachedTickets = await similarityCache.GetAsync(embedding);
+
+            if (cachedTickets is not null)
+                return cachedTickets;
         }
-
-        var cachedTickets = await similarityCache.GetAsync(embedding);
-
-        if (cachedTickets is not null)
-            return cachedTickets;
 
         var vector = new Vector(embedding);
 
@@ -64,7 +71,8 @@ public sealed class TicketRepository(AppDbContext dbContext, RedisSimilarityCach
             .Take(limit)
             .ToListAsync(cancellationToken);
 
-        await similarityCache.SetAsync(embedding, tickets, excludeTicketId);
+        if (similarityCache is not null)
+            await similarityCache.SetAsync(embedding, tickets, excludeTicketId);
 
         return tickets;
     }

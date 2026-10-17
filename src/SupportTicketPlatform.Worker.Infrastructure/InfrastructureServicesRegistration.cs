@@ -68,28 +68,33 @@ public static class InfrastructureServicesRegistration
         });
 #pragma warning restore OPENAI001
 
-        var redisConnectionString = workerOptions.ConnectionStrings.RedisConnectionString;
+        var redisOptions = configuration.GetSection("Redis").Get<RedisOptions>() ?? new RedisOptions();
 
-        if (string.IsNullOrWhiteSpace(redisConnectionString))
-            throw new InvalidOperationException("Redis connection string is missing.");
-
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
-        {
-            var options = ConfigurationOptions.Parse(redisConnectionString);
-            options.Ssl = true;
-            options.Protocol = RedisProtocol.Resp3;
-            options.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential()).GetAwaiter().GetResult();
-
-            var redis = ConnectionMultiplexer.Connect(options);
-
-            RedisSimilarityCacheIndex.CreateAsync(redis).GetAwaiter().GetResult();
-
-            return redis;
-        });
-
-        var redisOptions = configuration.GetSection("Redis").Get<RedisOptions>() ?? throw new InvalidOperationException("Redis configuration is missing.");
         services.AddSingleton(redisOptions);
-        services.AddSingleton<RedisSimilarityCache>();
+
+        if (redisOptions.Enabled)
+        {
+            var redisConnectionString = workerOptions.ConnectionStrings.RedisConnectionString;
+
+            if (string.IsNullOrWhiteSpace(redisConnectionString))
+                throw new InvalidOperationException("Redis connection string is missing.");
+
+            services.AddSingleton<IConnectionMultiplexer>(_ =>
+            {
+                var options = ConfigurationOptions.Parse(redisConnectionString);
+                options.Ssl = true;
+                options.Protocol = RedisProtocol.Resp3;
+                options.ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential()).GetAwaiter().GetResult();
+
+                var redis = ConnectionMultiplexer.Connect(options);
+
+                RedisSimilarityCacheIndex.CreateAsync(redis).GetAwaiter().GetResult();
+
+                return redis;
+            });
+
+            services.AddSingleton<RedisSimilarityCache>();
+        }
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<IEmbeddingService, AzureOpenAiEmbeddingService>();
         services.AddScoped<ITicketAnalysisService, AzureOpenAiTicketAnalysisService>();
