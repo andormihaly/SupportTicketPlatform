@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-ticket-api
+  namespace: support-ticket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-ticket-api
+  template:
+    metadata:
+      labels:
+        app: support-ticket-api
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: support-ticket-sa
+      containers:
+        - name: api
+          image: andorsupportticketacr.azurecr.io/support-ticket-platform-api:cgp
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AppConfiguration__Endpoint
+              value: "https://support-ticket-appconfi.azconfig.io"

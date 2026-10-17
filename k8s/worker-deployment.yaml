@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-ticket-worker
+  namespace: support-ticket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-ticket-worker
+  template:
+    metadata:
+      labels:
+        app: support-ticket-worker
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: support-ticket-sa
+      containers:
+        - name: worker
+          image: andorsupportticketacr.azurecr.io/support-ticket-platform-worker:cgr
+          env:
+            - name: AppConfiguration__Endpoint
+              value: "https://support-ticket-appconfi.azconfig.io"
