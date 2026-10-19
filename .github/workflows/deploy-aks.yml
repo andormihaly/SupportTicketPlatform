@@ -73,7 +73,8 @@ jobs:
         uses: azure/use-kubelogin@v1
         with:
           kubelogin-version: latest
-          github-token: ${{ github.token }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Get AKS credentials
         run: az aks get-credentials --resource-group $AKS_RESOURCE_GROUP --name $AKS_CLUSTER_NAME --overwrite-existing
