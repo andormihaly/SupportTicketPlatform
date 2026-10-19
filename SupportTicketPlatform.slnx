@@ -4,13 +4,13 @@
     <Project Path="src/SupportTicketPlatform.AppHost/SupportTicketPlatform.AppHost.csproj" />
     <Project Path="src/SupportTicketPlatform.Application/SupportTicketPlatform.Application.csproj" />
     <Project Path="src/SupportTicketPlatform.Contracts/SupportTicketPlatform.Contracts.csproj" />
-    <Project Path="src/SupportTicketPlatForm.Domain/SupportTicketPlatform.Domain.csproj" />
+    <Project Path="src/SupportTicketPlatform.Domain/SupportTicketPlatform.Domain.csproj" />
     <Project Path="src/SupportTicketPlatform.Infrastructure/SupportTicketPlatform.Infrastructure.csproj" />
     <Project Path="src/SupportTicketPlatform.Persistence/SupportTicketPlatform.Persistence.csproj" Id="c0e894e8-4dcd-46f6-9918-297942d64f4e" />
     <Project Path="src/SupportTicketPlatform.Seeder/SupportTicketPlatform.Seeder.csproj" Id="b57e3cdb-8597-4f48-a0e4-9348944f66ec" />
     <Project Path="src/SupportTicketPlatform.ServiceDefaults/SupportTicketPlatform.ServiceDefaults.csproj" Id="ebad4287-1b12-4d2d-b0fe-69c3cb5a93fb" />
-    <Project Path="src/SupportTicketPlatForm.Worker.Application/SupportTicketPlatform.Worker.Application.csproj" />
-    <Project Path="src/SupportTicketPlatForm.Worker.Infrastructure/SupportTicketPlatform.Worker.Infrastructure.csproj" />
+    <Project Path="src/SupportTicketPlatform.Worker.Application/SupportTicketPlatform.Worker.Application.csproj" />
+    <Project Path="src/SupportTicketPlatform.Worker.Infrastructure/SupportTicketPlatform.Worker.Infrastructure.csproj" />
     <Project Path="src/SupportTicketPlatform.Worker/SupportTicketPlatform.Worker.csproj" />
   </Folder>
   <Folder Name="/test/">
