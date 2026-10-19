@@ -1,6 +1,6 @@
 using SupportTicketPlatform.Application.Interfaces;
 
-namespace SupportTicketPlatform.Api.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
+namespace SupportTicketPlatform.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
 
 public sealed class GetTicketAnalysisHandler(ITicketRepository ticketRepository)
 {

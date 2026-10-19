@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using SupportTicketPlatform.Api.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.AnalyzeTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateResolution;
 using SupportTicketPlatform.Application.Features.Tickets.Commands.CreateTicket;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTickets;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetSimilarTicketsByText;
 using SupportTicketPlatform.Application.Features.Tickets.Queries.GetTicket;
+using SupportTicketPlatform.Application.Queries.Features.TicketAnalysis.GetTicketAnalysis;
 using Wolverine;
 
 namespace SupportTicketPlatform.Api.Controllers;
