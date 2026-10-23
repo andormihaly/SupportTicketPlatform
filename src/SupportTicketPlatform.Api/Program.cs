@@ -75,6 +75,7 @@ app.UseExceptionHandler();
 
 app.UseHttpLogging();
 
+// uncomented to be able to use scalar for testing
 //if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
